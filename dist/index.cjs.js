@@ -374,21 +374,51 @@ function createGridComponent(_ref2) {
           rowStopIndex = _this$_getVerticalRan[1];
 
       var items = [];
+      var topStickyItems = [];
+      var leftStickyItems = [];
 
       if (columnCount > 0 && rowCount) {
-        for (var _rowIndex = rowStartIndex; _rowIndex <= rowStopIndex; _rowIndex++) {
-          for (var _columnIndex = columnStartIndex; _columnIndex <= columnStopIndex; _columnIndex++) {
-            items.push(react.createElement(children, {
+        for (var _columnIndex = Math.max(1, columnStartIndex); _columnIndex <= columnStopIndex; _columnIndex++) {
+          topStickyItems.push(react.createElement(children, {
+            columnIndex: _columnIndex,
+            data: itemData,
+            isScrolling: useIsScrolling ? isScrolling : undefined,
+            key: itemKey({
               columnIndex: _columnIndex,
+              data: itemData,
+              rowIndex: 0
+            }),
+            rowIndex: 0,
+            style: this._getItemStyle(0, _columnIndex)
+          }));
+        }
+
+        for (var _rowIndex = Math.max(1, rowStartIndex); _rowIndex <= rowStopIndex; _rowIndex++) {
+          leftStickyItems.push(react.createElement(children, {
+            columnIndex: 0,
+            data: itemData,
+            isScrolling: useIsScrolling ? isScrolling : undefined,
+            key: itemKey({
+              columnIndex: 0,
+              data: itemData,
+              rowIndex: _rowIndex
+            }),
+            rowIndex: _rowIndex,
+            style: this._getItemStyle(_rowIndex, 0)
+          }));
+
+          for (var _columnIndex2 = Math.max(1, columnStartIndex); _columnIndex2 <= columnStopIndex; _columnIndex2++) {
+            items.push(react.createElement(children, {
+              columnIndex: _columnIndex2,
               data: itemData,
               isScrolling: useIsScrolling ? isScrolling : undefined,
               key: itemKey({
-                columnIndex: _columnIndex,
+                columnIndex: _columnIndex2,
                 data: itemData,
                 rowIndex: _rowIndex
               }),
               rowIndex: _rowIndex,
-              style: this._getItemStyle(_rowIndex, _columnIndex)
+              style: this._getItemStyle(_rowIndex, _columnIndex2)
             }));
           }
         }
@@ -398,6 +428,34 @@ function createGridComponent(_ref2) {
 
       var estimatedTotalHeight = getEstimatedTotalHeight(this.props, this._instanceProps);
       var estimatedTotalWidth = getEstimatedTotalWidth(this.props, this._instanceProps);
+
+      var topLeftStyle = this._getItemStyle(0, 0);
+
+      items.unshift(react.createElement('div', {
+        children: leftStickyItems,
+        key: 'left-sticky',
+        className: 'left-sticky',
+        style: {
+          height: estimatedTotalHeight,
+          width: topLeftStyle.width,
+          position: 'sticky',
+          left: 0,
+          zIndex: 1,
+          transform: "translateY(-" + topLeftStyle.height + "px)"
+        }
+      }));
+      items.unshift(react.createElement('div', {
+        children: topStickyItems,
+        key: 'top-sticky',
+        className: 'top-sticky',
+        style: {
+          height: topLeftStyle.height,
+          width: estimatedTotalWidth,
+          position: 'sticky',
+          top: 0,
+          zIndex: 1
+        }
+      }));
       return react.createElement(outerElementType || outerTagName || 'div', {
         className: className,
         onScroll: this._onScroll,
