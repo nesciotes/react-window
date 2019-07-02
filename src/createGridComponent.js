@@ -404,7 +404,7 @@ export default function createGridComponent({
 
       if (columnCount > 0 && rowCount) {
         for (
-          let columnIndex = Math.max(1, columnStartIndex);
+          let columnIndex = Math.max(0, columnStartIndex);
           columnIndex <= columnStopIndex;
           columnIndex++
         ) {
