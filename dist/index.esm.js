@@ -356,7 +356,8 @@ function createGridComponent(_ref2) {
      rowCount = _this$props4.rowCount,
      style = _this$props4.style,
      useIsScrolling = _this$props4.useIsScrolling,
-     width = _this$props4.width;
+     width = _this$props4.width,
+     noSticky = _this$props4.noSticky;
     var isScrolling = this.state.isScrolling;
 
     var _this$_getHorizontalR = this._getHorizontalRangeToRender(),
@@ -372,7 +373,7 @@ function createGridComponent(_ref2) {
     var leftStickyItems = [];
 
     if (columnCount > 0 && rowCount) {
-     for (var _columnIndex = Math.max(1, columnStartIndex); _columnIndex <= columnStopIndex; _columnIndex++) {
+     for (var _columnIndex = Math.max(0, columnStartIndex); _columnIndex <= columnStopIndex; _columnIndex++) {
       topStickyItems.push(createElement(children, {
        columnIndex: _columnIndex,
        data: itemData,
@@ -388,20 +389,22 @@ function createGridComponent(_ref2) {
      }
 
      for (var _rowIndex = Math.max(1, rowStartIndex); _rowIndex <= rowStopIndex; _rowIndex++) {
-      leftStickyItems.push(createElement(children, {
-       columnIndex: 0,
-       data: itemData,
-       isScrolling: useIsScrolling ? isScrolling : undefined,
-       key: itemKey({
+      if (!noSticky) {
+       leftStickyItems.push(createElement(children, {
         columnIndex: 0,
         data: itemData,
-        rowIndex: _rowIndex
-       }),
-       rowIndex: _rowIndex,
-       style: this._getItemStyle(_rowIndex, 0)
-      }));
+        isScrolling: useIsScrolling ? isScrolling : undefined,
+        key: itemKey({
+         columnIndex: 0,
+         data: itemData,
+         rowIndex: _rowIndex
+        }),
+        rowIndex: _rowIndex,
+        style: this._getItemStyle(_rowIndex, 0)
+       }));
+      }
 
-      for (var _columnIndex2 = Math.max(1, columnStartIndex); _columnIndex2 <= columnStopIndex; _columnIndex2++) {
+      for (var _columnIndex2 = noSticky ? 0 : Math.max(1, columnStartIndex); _columnIndex2 <= columnStopIndex; _columnIndex2++) {
        items.push(createElement(children, {
         columnIndex: _columnIndex2,
         data: itemData,
@@ -425,19 +428,21 @@ function createGridComponent(_ref2) {
 
     var topLeftStyle = this._getItemStyle(0, 0);
 
-    items.unshift(createElement('div', {
-     children: leftStickyItems,
-     key: 'left-sticky',
-     className: 'left-sticky',
-     style: {
-      height: estimatedTotalHeight,
-      width: topLeftStyle.width,
-      position: 'sticky',
-      left: 0,
-      zIndex: 1,
-      transform: "translateY(-" + topLeftStyle.height + "px)"
-     }
-    }));
+    if (!noSticky) {
+     items.unshift(createElement('div', {
+      children: leftStickyItems,
+      key: 'left-sticky',
+      className: 'left-sticky',
+      style: {
+       height: estimatedTotalHeight,
+       width: topLeftStyle.width,
+       position: 'sticky',
+       left: 0,
+       zIndex: 1,
+       transform: "translateY(-" + topLeftStyle.height + "px)"
+      }
+     }));
+    }
     items.unshift(createElement('div', {
      children: topStickyItems,
      key: 'top-sticky',
